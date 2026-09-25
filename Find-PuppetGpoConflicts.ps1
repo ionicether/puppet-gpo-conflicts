@@ -1,4 +1,4 @@
-#Requires -Version 5.1+
+#Requires -Version 5.1
 #Requires -RunAsAdministrator
 <#
 Author  : ionicether
@@ -148,10 +148,10 @@ foreach ($s in Get-Winning RSOP_RegistryPolicySetting) {
     if ($valueName.StartsWith('**') -or -not ($valueName -or $bytes.Count)) { continue }
 
     $value = switch ($s.valueType) {
-        4  { if ($bytes.Count -ge 4) { [BitConverter]::ToUInt32($bytes, 0) } }
+        4 { if ($bytes.Count -ge 4) { [BitConverter]::ToUInt32($bytes, 0) } }
         11 { if ($bytes.Count -ge 8) { [BitConverter]::ToUInt64($bytes, 0) } }
         { $_ -in 1, 2 } { [Text.Encoding]::Unicode.GetString($bytes).TrimEnd([char]0) }
-        7  { ([Text.Encoding]::Unicode.GetString($bytes).TrimEnd([char]0) -split "`0") -join ',' }
+        7 { ([Text.Encoding]::Unicode.GetString($bytes).TrimEnd([char]0) -split "`0") -join ',' }
         default { ($bytes | ForEach-Object { $_.ToString('x2') }) -join '' }
     }
     Add-Gp (Get-RegId $s.registryKey $valueName) $value $s.GPOID
@@ -238,14 +238,14 @@ function Add-Conflict([string]$Id, [string]$Ref, [string]$Value, $CompareTo) {
     if (-not $hit) { return }
     if ($null -eq $CompareTo) { $CompareTo = $hit.Value }
     $conflicts.Add([pscustomobject]@{
-        Setting     = $Id
-        Puppet      = $Ref
-        PuppetValue = $Value
-        Gpo         = $hit.Gpo
-        GpoValue    = $hit.Value
-        # merge: only adds accounts, compare means nothing
-        Agrees      = if ($Value -match '^merge:') { $null } else { (Get-Comparable $Id $Value) -eq (Get-Comparable $Id $CompareTo) }
-    })
+            Setting     = $Id
+            Puppet      = $Ref
+            PuppetValue = $Value
+            Gpo         = $hit.Gpo
+            GpoValue    = $hit.Value
+            # merge: only adds accounts, compare means nothing
+            Agrees      = if ($Value -match '^merge:') { $null } else { (Get-Comparable $Id $Value) -eq (Get-Comparable $Id $CompareTo) }
+        })
 }
 $skipped = [Collections.Generic.List[string]]::new()
 
@@ -293,10 +293,10 @@ foreach ($r in $catalog.resources) {
             if ($known -and $known.Current) { $compareTo = $known.Current }
             if ($setting) {
                 $id = switch ($type) {
-                    'System Access'    { "sec:$setting" }
+                    'System Access' { "sec:$setting" }
                     'Privilege Rights' { "right:$setting" }
-                    'Event Audit'      { "audit:$setting" }
-                    'Registry Values'  { Split-RegPath $setting }
+                    'Event Audit' { "audit:$setting" }
+                    'Registry Values' { Split-RegPath $setting }
                 }
             }
             if ($type -eq 'Event Audit' -and $legacyAuditIgnored) { $ignoredByPuppet.Add($ref) }
@@ -305,7 +305,7 @@ foreach ($r in $catalog.resources) {
 
     if (-not $id) {
         $unchecked = $r.type -in $checkedTypes + $uncheckedTypes -or $r.type -like 'Dsc_*' -or
-            ($r.type -eq 'Registry_key' -and $p.purge_values)
+        ($r.type -eq 'Registry_key' -and $p.purge_values)
         if ($unchecked) { $skipped.Add($ref) }
         continue
     }
